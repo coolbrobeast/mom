@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a0a2e">
+<title>Yoshi's Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pu:#6b21d6;--pu2:#4a10a0;--pu3:#a855f7;--pu4:#d8b4fe;
+  --gr:#22a84a;--gr2:#166534;--gr3:#86efac;
+  --bg:#1a0a2e;--card:rgba(30,10,64,.75);--card2:rgba(13,6,32,.9);
+  --txt:#f0e6ff;--txt2:#c084fc;--txt3:#86efac;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Nunito',sans-serif;color:var(--txt);
+  background:radial-gradient(ellipse at top,#2d1060 0%,#1a0a2e 50%,#0d3a1a 100%);
+  min-height:100vh;min-height:100dvh;overflow-x:hidden;
+}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(90deg,var(--pu),var(--gr));
+  padding:14px 16px 26px;display:flex;align-items:center;gap:12px;
+  position:relative;overflow:hidden;
+}
+.hdr::after{
+  content:'';position:absolute;bottom:-10px;left:0;right:0;height:20px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 20'%3E%3Ccircle cx='30' cy='10' r='10' fill='%231a0a2e'/%3E%3C/svg%3E") repeat-x;
+  background-size:60px 20px;
+}
+.hdr-av{
+  width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.5);
+  overflow:hidden;flex-shrink:0;animation:ybounce 1.6s ease-in-out infinite alternate;
+  background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.hdr-av img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+@keyframes ybounce{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-8px) rotate(4deg)}}
+.hdr-title{font-family:'Fredoka One',cursive;font-size:clamp(20px,6vw,26px);color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.3);line-height:1.1}
+.hdr-sub{font-size:12px;color:#d4b8ff;font-weight:700;margin-top:3px}
+.hdr-sub b{color:var(--gr3)}
+
+/* TABS */
+.tabs{display:flex;background:#0d0620;border-bottom:2px solid var(--pu2);position:sticky;top:0;z-index:50}
+.tab{
+  flex:1;min-height:52px;padding:8px 2px 6px;
+  font-size:10px;font-weight:800;text-align:center;
+  border:none;background:none;color:#5a2d9a;
+  border-bottom:3px solid transparent;cursor:pointer;
+  transition:all .2s;text-transform:uppercase;letter-spacing:.4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+}
+.tab.active{color:#fff;border-bottom:3px solid var(--gr3);background:rgba(107,33,214,.2)}
+.ti{font-size:20px;line-height:1}
+
+/* PAGES */
+.page{display:none;padding:14px 12px;padding-bottom:max(14px,env(safe-area-inset-bottom));max-width:540px;margin:0 auto}
+.page.active{display:block}
+
+/* CARD */
+.card{
+  background:var(--card);border:1.5px solid var(--pu2);border-radius:18px;
+  padding:16px;margin-bottom:14px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.ctitle{font-family:'Fredoka One',cursive;font-size:15px;color:var(--txt2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* FORM */
+.inp{
+  width:100%;background:rgba(13,6,32,.9);border:1.5px solid var(--pu);
+  border-radius:10px;color:var(--txt);padding:12px 14px;
+  font-size:15px;font-family:'Nunito',sans-serif;outline:none;
+  transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+.inp:focus{border-color:var(--pu3)}
+select.inp{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a855f7' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;
+}
+select.inp option{background:#1a0a2e;color:var(--txt)}
+.row{display:flex;gap:8px;margin-bottom:10px}
+.row .inp{flex:1}
+
+.btn{
+  width:100%;background:linear-gradient(90deg,var(--pu),var(--gr));color:#fff;
+  border:none;border-radius:12px;padding:13px 16px;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;
+  cursor:pointer;transition:transform .1s,opacity .15s;min-height:50px;
+}
+.btn:active{transform:scale(.96);opacity:.85}
+
+/* ALARM */
+.clock-big{font-family:'Fredoka One',cursive;font-size:clamp(44px,14vw,66px);color:var(--pu3);letter-spacing:3px;line-height:1;text-align:center}
+.clock-date{font-size:13px;color:var(--gr3);font-weight:700;text-align:center;margin-top:6px}
+
+.alarm-row{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(13,6,32,.8);border:1px solid var(--pu);
+  border-radius:12px;padding:12px 14px;margin-bottom:8px;
+}
+.alarm-row:last-child{margin-bottom:0}
+.a-info{flex:1;min-width:0}
+.a-time{font-family:'Fredoka One',cursive;font-size:22px;color:var(--pu4)}
+.a-lbl{font-size:11px;color:var(--gr3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tog{width:46px;height:26px;border-radius:13px;border:none;cursor:pointer;background:#374151;position:relative;flex-shrink:0;transition:background .2s}
+.tog.on{background:#22c55e}
+.tog::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s}
+.tog.on::after{transform:translateX(20px)}
+.del{background:none;border:none;color:#f87171;font-size:20px;cursor:pointer;padding:4px;flex-shrink:0}
+.notif-ok{background:rgba(20,83,45,.8);border:1px solid #22c55e;border-radius:10px;padding:9px 12px;font-size:12px;color:var(--gr3);margin-top:10px;display:none}
+
+/* ALARM OVERLAY */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(74,16,160,.97);
+  flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;
+}
+.overlay.show{display:flex}
+.ov-emoji{font-size:80px;animation:ybounce .5s ease-in-out infinite alternate}
+.ov-time{font-family:'Fredoka One',cursive;font-size:clamp(40px,12vw,56px);color:#fff}
+.ov-lbl{font-family:'Fredoka One',cursive;font-size:22px;color:var(--gr3);text-align:center}
+.ov-dismiss{background:#fff;color:var(--pu2);border:none;border-radius:16px;padding:16px 40px;font-family:'Fredoka One',cursive;font-size:22px;cursor:pointer;margin-top:8px}
+
+/* FIDGET */
+#spinner{touch-action:none;cursor:grab;display:block;margin:0 auto;border-radius:50%}
+#spinner:active{cursor:grabbing}
+.stats{display:flex;justify-content:center;gap:clamp(16px,6vw,44px);margin:12px 0}
+.stat{text-align:center}
+.sv{font-family:'Fredoka One',cursive;font-size:28px;color:var(--pu3)}
+.sl{font-size:11px;color:var(--gr3);font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.pop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pop-btn{
+  aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;
+  font-size:clamp(18px,5vw,24px);background:var(--pu);
+  box-shadow:0 5px 0 var(--pu2);transition:transform .1s;min-height:52px;
+}
+.pop-btn.dn{background:#1e0a40;box-shadow:inset 0 3px 6px rgba(0,0,0,.6);transform:scale(.88)}
+
+/* CHAT */
+.chat-top{
+  display:flex;align-items:center;gap:12px;margin-bottom:10px;
+  background:linear-gradient(90deg,rgba(74,16,160,.5),rgba(22,101,52,.5));
+  border-radius:14px;padding:10px 14px;border:1px solid var(--pu);
+}
+.yoshi-av{
+  width:48px;height:48px;border-radius:50%;overflow:hidden;border:2.5px solid var(--gr3);
+  flex-shrink:0;background:rgba(34,168,74,.2);display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.yoshi-av img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.yn{font-family:'Fredoka One',cursive;font-size:18px}
+.ys{font-size:11px;color:var(--gr3);font-weight:700}
+.ys::before{content:'● ';color:#22c55e}
+
+.fb-status{font-size:11px;padding:7px 12px;border-radius:8px;text-align:center;margin-bottom:10px;font-weight:700}
+.fb-ok{background:rgba(20,83,45,.6);color:var(--gr3);border:1px solid #22c55e}
+.fb-err{background:rgba(127,29,29,.5);color:#fca5a5;border:1px solid #f87171}
+.fb-loading{background:rgba(30,10,64,.6);color:var(--pu4);border:1px solid var(--pu)}
+
+.msgbox{
+  background:var(--card2);border:1.5px solid var(--pu2);border-radius:14px;
+  height:clamp(240px,42vh,380px);overflow-y:auto;
+  padding:12px;display:flex;flex-direction:column;gap:10px;
+  margin-bottom:10px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
+}
+.msgbox::-webkit-scrollbar{width:3px}
+.msgbox::-webkit-scrollbar-thumb{background:var(--pu);border-radius:2px}
+
+.bubble{max-width:82%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.5;word-break:break-word}
+.bubble.yoshi{background:linear-gradient(135deg,#166534,#14532d);color:#bbf7d0;align-self:flex-start;border-bottom-left-radius:4px}
+.bubble.me{background:linear-gradient(135deg,var(--pu),var(--pu2));color:#e9d5ff;align-self:flex-end;border-bottom-right-radius:4px}
+.bn{font-size:10px;font-weight:800;margin-bottom:3px;opacity:.75}
+.bt{font-size:9px;opacity:.5;margin-top:3px;text-align:right}
+
+.cin-row{display:flex;gap:8px}
+.cin{
+  flex:1;background:var(--card2);border:1.5px solid var(--pu);
+  border-radius:12px;color:var(--txt);padding:12px 14px;
+  font-size:15px;font-family:'Nunito',sans-serif;outline:none;
+  transition:border-color .2s;min-height:50px;
+}
+.cin:focus{border-color:var(--pu3)}
+.csend{
+  background:linear-gradient(135deg,var(--pu),var(--gr));color:#fff;
+  border:none;border-radius:12px;padding:12px 16px;font-size:22px;
+  cursor:pointer;flex-shrink:0;min-width:54px;min-height:50px;transition:transform .1s;
+}
+.csend:active{transform:scale(.9)}
+.fb-tag{font-size:10px;color:#fb923c;text-align:center;margin-top:8px;font-weight:800;letter-spacing:.4px}
+
+/* EGGS */
+.egg-score{font-family:'Fredoka One',cursive;font-size:clamp(48px,15vw,72px);color:#fbbf24;text-align:center;line-height:1}
+.egg-lbl{font-size:12px;color:var(--gr3);text-align:center;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.stars{font-size:24px;text-align:center;letter-spacing:4px;margin-bottom:14px}
+.egg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.egg{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(22px,7vw,30px);cursor:pointer;border-radius:14px;
+  background:rgba(30,10,64,.8);border:1.5px solid var(--pu2);
+  transition:transform .15s,background .2s;user-select:none;min-height:60px;
+}
+.egg:hover{transform:scale(1.08)}
+.egg.hatched{background:rgba(20,83,45,.7);border-color:#22c55e}
+.egg-msg{font-size:12px;color:var(--pu4);text-align:center;font-weight:600;margin-bottom:10px;min-height:18px}
+</style>
+</head>
+<body>
+
+<!-- ALARM OVERLAY -->
+<div class="overlay" id="ov">
+  <div class="ov-emoji">🦕</div>
+  <div class="ov-time"  id="ovTime">00:00</div>
+  <div class="ov-lbl"   id="ovLbl">Wake up!</div>
+  <button class="ov-dismiss" onclick="dismissAlarm()">Dismiss 🥚</button>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-av">
+    <img src="YoshiandtheMysteriousBook_Adventure_yoshi.png" alt="Yoshi"
+      onerror="this.style.display='none'">
+  </div>
+  <div>
+    <div class="hdr-title">Yoshi's Dashboard</div>
+    <div class="hdr-sub">Purple &amp; Green Edition <b>🥚</b></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs" role="tablist">
+  <button class="tab active" onclick="goTab('alarm',this)"  role="tab"><span class="ti">⏰</span>Alarm</button>
+  <button class="tab"        onclick="goTab('fidget',this)" role="tab"><span class="ti">🌀</span>Fidget</button>
+  <button class="tab"        onclick="goTab('chat',this)"   role="tab"><span class="ti">💬</span>Chat</button>
+  <button class="tab"        onclick="goTab('eggs',this)"   role="tab"><span class="ti">🥚</span>Eggs</button>
+</div>
+
+<!-- ═══════ ALARM ═══════ -->
+<div class="page active" id="page-alarm">
+  <div class="card" style="padding:16px 16px 12px">
+    <div class="clock-big" id="clk">00:00:00</div>
+    <div class="clock-date" id="clkDate">—</div>
+  </div>
+  <div class="card">
+    <div class="ctitle">⏰ My Alarms</div>
+    <div id="aList"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">➕ Add Alarm</div>
+    <div class="row">
+      <input type="time" id="aTime" class="inp">
+      <input type="text" id="aLbl" class="inp" placeholder="Label…" style="flex:2">
+    </div>
+    <div class="row" style="margin-bottom:12px">
+      <select id="aRep" class="inp">
+        <option value="once">Once</option>
+        <option value="daily">Every day</option>
+        <option value="weekdays">Weekdays</option>
+        <option value="weekends">Weekends</option>
+      </select>
+    </div>
+    <button class="btn" onclick="addAlarm()">🦕 Set Alarm</button>
+    <div class="notif-ok" id="notifOk">🔔 Notifications ON — alarms fire even when screen is off!</div>
+  </div>
+</div>
+
+<!-- ═══════ FIDGET ═══════ -->
+<div class="page" id="page-fidget">
+  <div class="card">
+    <div class="ctitle">🌀 Yoshi Spinner — drag to spin!</div>
+    <canvas id="spinner"></canvas>
+    <div class="stats">
+      <div class="stat"><div class="sv" id="sRpm">0</div><div class="sl">RPM</div></div>
+      <div class="stat"><div class="sv" id="sSpins">0</div><div class="sl">Spins</div></div>
+      <div class="stat"><div class="sv" id="sMax">0</div><div class="sl">Max</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle">🫧 Pop Bubbles</div>
+    <div class="pop-grid" id="popGrid"></div>
+  </div>
+</div>
+
+<!-- ═══════ CHAT ═══════ -->
+<div class="page" id="page-chat">
+  <div class="chat-top">
+    <div class="yoshi-av">
+      <img src="YoshiandtheMysteriousBook_Adventure_yoshi.png" alt="Yoshi"
+        onerror="this.style.display='none'">
+    </div>
+    <div>
+      <div class="yn">Yoshi</div>
+      <div class="ys">Live on Firebase 🔥</div>
+    </div>
+  </div>
+
+  <div class="fb-status fb-loading" id="fbSt">🔥 Connecting to Firebase…</div>
+
+  <div class="card" style="padding:10px;margin-bottom:10px">
+    <input type="text" id="myName" class="inp" placeholder="Your name…" value="Jack" maxlength="20" style="margin:0">
+  </div>
+
+  <div class="msgbox" id="msgBox">
+    <div style="margin:auto;text-align:center;color:#5a2d9a;font-size:13px;padding:20px">
+      Connecting… 🦕
+    </div>
+  </div>
+
+  <div class="cin-row">
+    <input type="text" id="cin" class="cin" placeholder="Say something to Yoshi…"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+    <button class="csend" onclick="sendMsg()">🥚</button>
+  </div>
+  <div class="fb-tag">🔥 LIVE · Firebase Firestore · mom-ec61e</div>
+</div>
+
+<!-- ═══════ EGGS ═══════ -->
+<div class="page" id="page-eggs">
+  <div class="card" style="text-align:center">
+    <div class="egg-score" id="eScore">0</div>
+    <div class="egg-lbl">Eggs Collected</div>
+    <div class="stars"    id="eStars">☆☆☆☆☆</div>
+    <div class="egg-msg"  id="eMsg">Tap an egg to hatch it!</div>
+  </div>
+  <div class="egg-grid" id="eGrid"></div>
+  <button class="btn" onclick="resetEggs()">🔄 New Egg Batch</button>
+</div>
+
+<!-- ═══════ FIREBASE (ES module) ═══════ -->
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc,
+  query, orderBy, limit, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const cfg = {
+  apiKey:            "AIzaSyCMWlhzNr9w75BYmdR4k6uJHM2sNwq5VtY",
+  authDomain:        "mom-ec61e.firebaseapp.com",
+  projectId:         "mom-ec61e",
+  storageBucket:     "mom-ec61e.firebasestorage.app",
+  messagingSenderId: "484030918424",
+  appId:             "1:484030918424:web:b0814ae30936e974bd786d",
+  measurementId:     "G-828H3CWQ5N"
+};
+
+const app = initializeApp(cfg);
+const db  = getFirestore(app);
+
+// ─── expose send to global scope ───
+window._fbSend = async (from, name, text) => {
+  return addDoc(collection(db, "yoshiChat"), {
+    from, name, text,
+    time: serverTimestamp()
+  });
+};
+
+// ─── real-time listener ───
+const q = query(
+  collection(db, "yoshiChat"),
+  orderBy("time", "asc"),
+  limit(80)
+);
+
+onSnapshot(q,
+  snap => {
+    const box = document.getElementById("msgBox");
+    box.innerHTML = "";
+    if (snap.empty) {
+      box.innerHTML = '<div style="margin:auto;text-align:center;color:#5a2d9a;font-size:13px;padding:20px">No messages yet — say hi to Yoshi! 🦕</div>';
+    } else {
+      snap.forEach(doc => {
+        const d = doc.data();
+        window._addBubble(d.from, d.name, d.text, d.time?.toDate());
+      });
+    }
+    box.scrollTop = box.scrollHeight;
+    setFbSt("ok");
+  },
+  err => {
+    console.error("Firestore error:", err);
+    setFbSt("err", err.code || err.message);
+  }
+);
+
+window._fbReady = true;
+setFbSt("ok");
+
+function setFbSt(state, msg) {
+  const el = document.getElementById("fbSt");
+  if (!el) return;
+  if (state === "ok") {
+    el.className = "fb-status fb-ok";
+    el.textContent = "🟢 Firebase connected — messages saved in real-time!";
+  } else {
+    el.className = "fb-status fb-err";
+    el.textContent = "🔴 Firestore error: " + (msg || "check rules") +
+      " — go to Firebase Console → Firestore → Rules and set: allow read, write: if true;";
+  }
+}
+</script>
+
+<!-- ═══════ MAIN SCRIPT ═══════ -->
+<script>
+// ── shared bubble renderer (used by module listener + local fallback) ──
+window._addBubble = function(from, name, text, time) {
+  const box = document.getElementById("msgBox");
+  const el = document.createElement("div");
+  el.className = "bubble " + (from === "yoshi" ? "yoshi" : "me");
+  const d  = time instanceof Date ? time : new Date();
+  const ts = d.toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit"});
+  const sn = String(name||"Jack").replace(/[<>&]/g, c=>({'"':'&quot;','<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+  const st = String(text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  el.innerHTML =
+    `<div class="bn">${from==="yoshi"?"🦕 Yoshi":"👤 "+sn}</div>${st}<div class="bt">${ts}</div>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+};
+
+// ── TAB SWITCHER ──
+function goTab(name, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("page-"+name).classList.add("active");
+  btn.classList.add("active");
+  if (name === "fidget") initSpinner();
+  if (name === "eggs")   initEggs();
+}
+
+// ── CLOCK ──
+function tick() {
+  const n = new Date();
+  document.getElementById("clk").textContent =
+    n.toLocaleTimeString("en-US", {hour12:false});
+  document.getElementById("clkDate").textContent =
+    n.toLocaleDateString("en-US", {weekday:"long", month:"long", day:"numeric"});
+}
+setInterval(tick, 1000); tick();
+
+// ── ALARMS ──
+let alarms = JSON.parse(localStorage.getItem("yd_alarms") || "[]");
+let ringing = false, alarmAC = null;
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderAlarms() {
+  const c = document.getElementById("aList");
+  if (!alarms.length) {
+    c.innerHTML = '<div style="font-size:13px;color:#5a2d9a;text-align:center;padding:8px">No alarms set yet!</div>';
+    return;
+  }
+  c.innerHTML = "";
+  alarms.forEach((a, i) => {
+    const d = document.createElement("div");
+    d.className = "alarm-row";
+    d.innerHTML = `
+      <div class="a-info">
+        <div class="a-time">${esc(a.time)}</div>
+        <div class="a-lbl">${esc(a.label||"Yoshi Alarm")} · ${esc(a.repeat)}</div>
+      </div>
+      <button class="tog${a.on?" on":""}" onclick="toggleA(${i})" aria-label="Toggle"></button>
+      <button class="del" onclick="delA(${i})" aria-label="Delete">🗑️</button>`;
+    c.appendChild(d);
+  });
+}
+
+function addAlarm() {
+  const t = document.getElementById("aTime").value;
+  const l = document.getElementById("aLbl").value.trim() || "Yoshi!";
+  const r = document.getElementById("aRep").value;
+  if (!t) { alert("Pick a time 🦕"); return; }
+  alarms.push({time:t, label:l, repeat:r, on:true, id:Date.now()});
+  saveAlarms(); renderAlarms(); askNotif();
+}
+function toggleA(i)  { alarms[i].on = !alarms[i].on; saveAlarms(); renderAlarms(); }
+function delA(i)     { alarms.splice(i, 1); saveAlarms(); renderAlarms(); }
+function saveAlarms(){ localStorage.setItem("yd_alarms", JSON.stringify(alarms)); }
+
+function askNotif() {
+  if ("Notification" in window) {
+    Notification.requestPermission().then(p => {
+      if (p === "granted") document.getElementById("notifOk").style.display = "block";
+    });
+  }
+}
+
+let lastHM = "";
+function checkAlarms() {
+  const n = new Date();
+  if (n.getSeconds() !== 0) return;
+  const hm = n.toLocaleTimeString("en-US",{hour12:false,hour:"2-digit",minute:"2-digit"}).slice(0,5);
+  if (hm === lastHM) return;
+  lastHM = hm;
+  const day = n.getDay();
+  alarms.forEach(a => {
+    if (!a.on || a.time !== hm) return;
+    if (a.repeat==="weekdays" && (day===0||day===6)) return;
+    if (a.repeat==="weekends" && day!==0 && day!==6) return;
+    fireAlarm(a);
+    if (a.repeat==="once") { a.on=false; saveAlarms(); renderAlarms(); }
+  });
+}
+setInterval(checkAlarms, 1000);
+
+function fireAlarm(a) {
+  ringing = true;
+  document.getElementById("ovTime").textContent = a.time;
+  document.getElementById("ovLbl").textContent  = a.label || "Wake up!";
+  document.getElementById("ov").classList.add("show");
+  if (Notification.permission === "granted") {
+    new Notification("🦕 "+(a.label||"Yoshi Alarm!"), {body:"Time: "+a.time});
+  }
+  playAlarmSound();
+}
+
+function playAlarmSound() {
+  try {
+    alarmAC = new (window.AudioContext || window.webkitAudioContext)();
+    let t = alarmAC.currentTime;
+    const loop = () => {
+      if (!ringing) return;
+      [523,659,784,1047].forEach((f,i) => {
+        const o=alarmAC.createOscillator(), g=alarmAC.createGain();
+        o.connect(g); g.connect(alarmAC.destination);
+        o.type="square"; o.frequency.value=f;
+        g.gain.setValueAtTime(.12, t+i*.12);
+        g.gain.exponentialRampToValueAtTime(.001, t+i*.12+.2);
+        o.start(t+i*.12); o.stop(t+i*.12+.25);
+      });
+      t += 0.85;
+      if (ringing) setTimeout(loop, 850);
+    };
+    loop();
+  } catch(e){}
+}
+
+function dismissAlarm() {
+  ringing = false;
+  document.getElementById("ov").classList.remove("show");
+  if (alarmAC) { try{ alarmAC.close(); }catch(e){} alarmAC=null; }
+}
+
+renderAlarms(); askNotif();
+
+// ── FIDGET SPINNER ──
+let spinOn = false;
+function initSpinner() {
+  if (spinOn) return; spinOn = true;
+  const cv  = document.getElementById("spinner");
+  const ctx = cv.getContext("2d");
+  const sz  = Math.min(window.innerWidth - 56, 240);
+  cv.width  = sz; cv.height = sz;
+  const cx=sz/2, cy=sz/2, r=sz*.38;
+
+  let angle=0, vel=0, drag=false, lastA=0, lastT=0;
+  let spinsAcc=0, prev=0, maxRpm=0;
+
+  const pt  = e => e.touches?e.touches[0]:e;
+  const ang = e => {
+    const rc=cv.getBoundingClientRect(), p=pt(e);
+    return Math.atan2(p.clientY-(rc.top+rc.height/2), p.clientX-(rc.left+rc.width/2));
+  };
+
+  cv.addEventListener("mousedown",  e => { drag=true; lastA=ang(e); lastT=Date.now(); });
+  cv.addEventListener("touchstart", e => { e.preventDefault(); drag=true; lastA=ang(e); lastT=Date.now(); }, {passive:false});
+  window.addEventListener("mousemove", e => {
+    if (!drag) return;
+    const a=ang(e), dt=Math.max((Date.now()-lastT)/1000,.008), da=a-lastA;
+    vel=da/dt; lastA=a; lastT=Date.now(); angle+=da;
+  });
+  window.addEventListener("touchmove", e => {
+    if (!drag) return;
+    const a=ang(e), dt=Math.max((Date.now()-lastT)/1000,.008), da=a-lastA;
+    vel=da/dt; lastA=a; lastT=Date.now(); angle+=da;
+  }, {passive:false});
+  window.addEventListener("mouseup",  () => drag=false);
+  window.addEventListener("touchend", () => drag=false);
+
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!drag) vel *= .987;
+    angle += vel * .016;
+
+    const rpm = Math.round(Math.abs(vel)/(2*Math.PI)*60);
+    if (rpm>maxRpm) maxRpm=rpm;
+    document.getElementById("sRpm").textContent   = rpm;
+    document.getElementById("sMax").textContent   = maxRpm;
+    const da = angle-prev;
+    spinsAcc += Math.abs(da)/(2*Math.PI);
+    document.getElementById("sSpins").textContent = Math.floor(spinsAcc);
+    prev = angle;
+
+    ctx.clearRect(0,0,sz,sz);
+    for (let i=0;i<3;i++){
+      const a = angle + i*(2*Math.PI/3);
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(a);
+      const g = ctx.createLinearGradient(0,-r,0,r);
+      g.addColorStop(0,"#7c3aed"); g.addColorStop(.5,"#22c55e"); g.addColorStop(1,"#4a10a0");
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.ellipse(0,-r*.62,r*.22,r*.52,0,0,2*Math.PI); ctx.fill();
+      ctx.restore();
+    }
+    const cg=ctx.createRadialGradient(cx,cy,4,cx,cy,r*.26);
+    cg.addColorStop(0,"#c084fc"); cg.addColorStop(1,"#166534");
+    ctx.beginPath(); ctx.arc(cx,cy,r*.26,0,2*Math.PI); ctx.fillStyle=cg; ctx.fill();
+    ctx.font=`${Math.round(r*.22)}px serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("🦕",cx,cy);
+  }
+  frame();
+
+  const pg = document.getElementById("popGrid");
+  if (!pg.children.length){
+    for (let i=0;i<16;i++){
+      const b = document.createElement("button");
+      b.className="pop-btn"; b.textContent="🫧";
+      b.onclick = function(){
+        const up = !this.classList.contains("dn");
+        this.classList.toggle("dn");
+        this.textContent = up?"•":"🫧";
+        try{
+          const ac=new(window.AudioContext||window.webkitAudioContext)();
+          const o=ac.createOscillator(), g=ac.createGain();
+          o.connect(g); g.connect(ac.destination);
+          o.frequency.value = up ? 300+Math.random()*200 : 180;
+          g.gain.setValueAtTime(.2, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(.001, ac.currentTime+.12);
+          o.start(); o.stop(ac.currentTime+.15);
+        }catch(e){}
+      };
+      pg.appendChild(b);
+    }
+  }
+}
+
+// ── CHAT ──
+const YOSHIS = [
+  "Yoshi! 🟢 Wahoo!","I got an egg for you! 🥚","Jump on my back! 🦕",
+  "Yoshi yoshi yoshi!","Nom nom nom! 🍎","Weeee! 🌟 Flutter jump!",
+  "I'll carry you anywhere! 💚","Let's find more eggs! 🥚🥚",
+  "Yoshi says hi! 🦖","You're my favourite! 💜","Hip hip hooray! 🎉",
+  "Super happy to chat! 🌟","Ready for adventure! 🗺️",
+];
+
+function sendMsg() {
+  const inp  = document.getElementById("cin");
+  const name = (document.getElementById("myName").value.trim() || "Jack").slice(0,20);
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = "";
+  inp.focus();
+
+  const reply = YOSHIS[Math.floor(Math.random()*YOSHIS.length)];
+
+  if (window._fbReady && window._fbSend) {
+    // Both messages go to Firestore — the onSnapshot listener will display them
+    window._fbSend("user", name, text)
+      .then(() => setTimeout(() => window._fbSend("yoshi","Yoshi",reply), 950))
+      .catch(err => {
+        console.error("Firestore write error:", err);
+        // show locally if write fails
+        window._addBubble("user", name, text, new Date());
+        setTimeout(()=>window._addBubble("yoshi","Yoshi",reply,new Date()), 950);
+      });
+  } else {
+    // Firebase not ready yet — show locally
+    window._addBubble("user", name, text, new Date());
+    setTimeout(()=>window._addBubble("yoshi","Yoshi",reply,new Date()), 950);
+  }
+}
+
+// ── EGGS ──
+let eggArr=[], eggOn=false;
+function initEggs() { if(eggOn)return; eggOn=true; buildEggs(); }
+function buildEggs() {
+  eggArr = Array(12).fill(false);
+  const g = document.getElementById("eGrid");
+  g.innerHTML = "";
+  eggArr.forEach((_,i) => {
+    const el = document.createElement("div");
+    el.className="egg"; el.textContent="🥚";
+    el.onclick = function() {
+      if (!eggArr[i]) {
+        eggArr[i]=true;
+        el.classList.add("hatched");
+        el.textContent=["🦕","🦖","💚","🌟","🟢","🫧"][Math.floor(Math.random()*6)];
+        try{
+          const ac=new(window.AudioContext||window.webkitAudioContext)();
+          [660,880,1100].forEach((f,j)=>{
+            const o=ac.createOscillator(),gn=ac.createGain();
+            o.connect(gn);gn.connect(ac.destination);
+            o.frequency.value=f;
+            gn.gain.setValueAtTime(.18,ac.currentTime+j*.08);
+            gn.gain.exponentialRampToValueAtTime(.001,ac.currentTime+j*.08+.18);
+            o.start(ac.currentTime+j*.08);o.stop(ac.currentTime+j*.08+.22);
+          });
+        }catch(e){}
+        updateEggs();
+      }
+    };
+    g.appendChild(el);
+  });
+  updateEggs();
+}
+function updateEggs() {
+  const n = eggArr.filter(Boolean).length;
+  document.getElementById("eScore").textContent = n;
+  const f = Math.min(5, Math.floor(n/2.4));
+  document.getElementById("eStars").textContent = "★".repeat(f)+"☆".repeat(5-f);
+  document.getElementById("eMsg").textContent   =
+    n===0  ? "Tap an egg to hatch it!" :
+    n===12 ? "🎉 All 12 hatched! Yoshi master!" :
+    `${n} hatched · ${12-n} left!`;
+}
+function resetEggs() { eggOn=false; initEggs(); }
+</script>
+</body>
+</html>
